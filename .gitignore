@@ -31,3 +31,4 @@ Thumbs.db
 # Uploads / local temp
 /uploads/*
 /outbox/*
+/tantri-backend
