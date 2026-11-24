@@ -3,6 +3,21 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import {
+  IconAlert,
+  IconAward,
+  IconBox,
+  IconChart,
+  IconCheck,
+  IconChevronDown,
+  IconGlobe,
+  IconLogout,
+  IconLoom,
+  IconSettings,
+  IconStar,
+  IconTag,
+  IconUsers,
+} from '@/components/Icons';
+import {
   DEMO_CATEGORIES,
   DEMO_CONFIG,
   DEMO_OFFERS,
@@ -18,13 +33,13 @@ type AdminView = 'dashboard' | 'products' | 'orders' | 'offers' | 'customers' | 
 
 const tk = (n: number) => '৳' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 
-const NAV: [AdminView, string, string][] = [
-  ['dashboard', '📊', 'Dashboard'],
-  ['products', '🧵', 'Products'],
-  ['orders', '📦', 'Orders'],
-  ['offers', '🏷️', 'Offers'],
-  ['customers', '👥', 'Customers'],
-  ['settings', '⚙️', 'Settings'],
+const NAV: { key: AdminView; icon: React.ReactNode; label: string }[] = [
+  { key: 'dashboard', icon: <IconChart size={18} />, label: 'Dashboard' },
+  { key: 'products', icon: <IconLoom size={18} />, label: 'Products' },
+  { key: 'orders', icon: <IconBox size={18} />, label: 'Orders' },
+  { key: 'offers', icon: <IconTag size={18} />, label: 'Offers' },
+  { key: 'customers', icon: <IconUsers size={18} />, label: 'Customers' },
+  { key: 'settings', icon: <IconSettings size={18} />, label: 'Settings' },
 ];
 
 export default function AdminPage() {
@@ -210,14 +225,14 @@ export default function AdminPage() {
       <div className="adm-app">
         <aside className="adm-side">
           <img src="/img/logo-light.svg" alt="Tantri" />
-          {NAV.map(([k, icon, label]) => (
-            <button key={k} className={`nv ${view === k ? 'on' : ''}`} onClick={() => setView(k)}>
-              {icon} {label}
+          {NAV.map((item) => (
+            <button key={item.key} className={`nv ${view === item.key ? 'on' : ''}`} onClick={() => setView(item.key)}>
+              {item.icon} {item.label}
             </button>
           ))}
           <div className="sp" />
           <Link className="nv" href="/">
-            🌐 View store
+            <IconGlobe size={18} /> View store
           </Link>
           <button
             className="nv"
@@ -227,7 +242,7 @@ export default function AdminPage() {
               setStep(1);
             }}
           >
-            ↩ Log out
+            <IconLogout size={18} /> Log out
           </button>
           <small>{me.email}</small>
         </aside>
@@ -275,7 +290,9 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div className="adm-card">
-                  <h3>⚠ Low stock</h3>
+                  <h3 className="adm-h-ico">
+                    <IconAlert size={16} /> Low stock
+                  </h3>
                   {stats.low_stock.length ? (
                     <table>
                       <tbody>
@@ -290,7 +307,9 @@ export default function AdminPage() {
                       </tbody>
                     </table>
                   ) : (
-                    <div className="adm-emp">All products well stocked 👍</div>
+                    <div className="adm-emp adm-h-ico" style={{ justifyContent: 'center' }}>
+                      <IconCheck size={16} /> All products well stocked
+                    </div>
                   )}
                 </div>
               </div>
@@ -324,7 +343,9 @@ export default function AdminPage() {
                   </table>
                 </div>
                 <div className="adm-card">
-                  <h3>🏆 Best sellers</h3>
+                  <h3 className="adm-h-ico">
+                    <IconAward size={16} /> Best sellers
+                  </h3>
                   <table>
                     <tbody>
                       {stats.top.map((p) => (
@@ -368,9 +389,14 @@ export default function AdminPage() {
                         <td>
                           <b>{p.name}</b>
                           <br />
-                          <small className="adm-mut">
+                          <small className="adm-mut adm-feat">
                             {p.sku}
-                            {p.featured ? ' · ⭐ featured' : ''}
+                            {p.featured && (
+                              <span className="adm-feat-tag">
+                                {' '}
+                                · <IconStar size={12} /> featured
+                              </span>
+                            )}
                           </small>
                         </td>
                         <td>{p.category_name || DEMO_CATEGORIES.find((c) => c.id === p.category_id)?.name}</td>
@@ -448,7 +474,9 @@ export default function AdminPage() {
                             <td>
                               <span className={`adm-pill ${o.status}`}>{o.status}</span>
                             </td>
-                            <td>▾</td>
+                            <td>
+                              <IconChevronDown size={16} />
+                            </td>
                           </tr>
                           {expandedOrder === o.id && (
                             <tr className="adm-ox">

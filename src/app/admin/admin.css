@@ -60,6 +60,9 @@
 .adm-ox td { padding: 16px 20px; }
 .adm-mut { color: var(--muted); }
 .adm-emp { text-align: center; color: var(--muted); padding: 40px; }
+.adm-h-ico { display: flex; align-items: center; gap: 8px; }
+.adm-h-ico svg { color: var(--maroon); flex-shrink: 0; }
+.adm-feat-tag { display: inline-flex; align-items: center; gap: 3px; color: var(--gold); font-weight: 600; }
 @media (max-width: 900px) {
   .adm-app { grid-template-columns: 1fr; }
   .adm-side { position: static; height: auto; flex-direction: row; overflow: auto; padding: 10px; }

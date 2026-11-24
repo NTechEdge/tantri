@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { IconCheck, IconMail } from '@/components/Icons';
 import { useStore } from '@/components/store/StoreProvider';
 import { DISTRICTS, DIST_BN, money, num, tk } from '@/lib/i18n';
 
@@ -26,7 +27,9 @@ export default function CheckoutPage() {
     return (
       <div className="wrap page">
         <div className="ok-box">
-          <div className="tick">✓</div>
+          <div className="tick">
+            <IconCheck size={38} />
+          </div>
           <h1 style={{ fontSize: 36 }}>{t('thanks')}</h1>
           <p style={{ color: 'var(--muted)', margin: '12px 0 6px' }}>
             {t('order_lbl')} <b style={{ color: 'var(--maroon)' }}>#{placed.order_no}</b> · {tk(lang, placed.total)}
@@ -304,7 +307,10 @@ export default function CheckoutPage() {
           <button className="btn block" type="submit" disabled={placing} style={{ marginTop: 18 }}>
             {placing ? t('placing') : t('place')}
           </button>
-          <p style={{ fontSize: 12.5, color: 'var(--muted)', textAlign: 'center', marginTop: 12 }}>{t('inv_auto')}</p>
+          <p className="inline-ico inv-note">
+            <IconMail size={15} />
+            {t('inv_auto')}
+          </p>
         </aside>
       </form>
     </div>

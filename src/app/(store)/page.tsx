@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { IconLoom, IconMail, IconTruck, IconWallet } from '@/components/Icons';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useStore } from '@/components/store/StoreProvider';
 import { DEMO_OFFERS, DEMO_PRODUCTS } from '@/lib/demo-data';
@@ -60,28 +61,36 @@ export default function HomePage() {
       <section className="trust">
         <div className="wrap">
           <div>
-            <i>🧵</i>
+            <i>
+              <IconLoom size={21} />
+            </i>
             <p>
               <b>{t('tr1')}</b>
               <span>{t('tr1s')}</span>
             </p>
           </div>
           <div>
-            <i>🚚</i>
+            <i>
+              <IconTruck size={21} />
+            </i>
             <p>
               <b>{t('tr2')}</b>
               <span>{t('tr2s', money(lang, cfg.free_shipping_over))}</span>
             </p>
           </div>
           <div>
-            <i>💵</i>
+            <i>
+              <IconWallet size={21} />
+            </i>
             <p>
               <b>{t('tr3')}</b>
               <span>{t('tr3s')}</span>
             </p>
           </div>
           <div>
-            <i>✉️</i>
+            <i>
+              <IconMail size={21} />
+            </i>
             <p>
               <b>{t('tr4')}</b>
               <span>{t('tr4s')}</span>

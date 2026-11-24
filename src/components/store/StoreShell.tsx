@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
+import { IconBag, IconClose, IconMenu, IconSearch, IconSparkle, IconUser } from '@/components/Icons';
 import { money, num, tk } from '@/lib/i18n';
 import { useStore } from './StoreProvider';
 
@@ -78,7 +79,7 @@ function LoginModal() {
   return (
     <div className="modal on" role="dialog" aria-modal="true">
       <button className="x" aria-label="Close" onClick={closeLogin}>
-        ×
+        <IconClose size={18} />
       </button>
       {step === 1 ? (
         <>
@@ -185,7 +186,7 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <header className="hdr">
         <div className="wrap hdr-in">
           <button className="icon-btn burger" aria-label="Menu" onClick={() => setNavOpen(true)}>
-            ☰
+            <IconMenu size={20} />
           </button>
           <Link href="/" className="brand">
             <img src="/img/logo.svg" alt="Tantri" />
@@ -216,7 +217,9 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
                 placeholder={t('search_ph')}
                 aria-label="Search"
               />
-              <button aria-label="Search">⌕</button>
+              <button aria-label="Search" className="search-btn">
+                <IconSearch size={17} />
+              </button>
             </form>
             <button className="lang" onClick={toggleLang} aria-label="Language">
               {lang === 'bn' ? 'EN' : 'বাংলা'}
@@ -226,10 +229,12 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
               aria-label="Account"
               onClick={() => (user ? router.push('/account') : openLogin())}
             >
-              👤<span id="accLabel">{user ? user.name || user.email.split('@')[0] : t('login')}</span>
+              <IconUser size={18} />
+              <span id="accLabel">{user ? user.name || user.email.split('@')[0] : t('login')}</span>
             </button>
             <button className="icon-btn cart-btn" aria-label="Cart" onClick={() => setCartOpen(true)}>
-              🛍<b>{num(lang, cartCount)}</b>
+              <IconBag size={19} />
+              <b>{num(lang, cartCount)}</b>
             </button>
           </div>
         </div>
@@ -281,8 +286,8 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
       <aside className={`drawer ${cartOpen ? 'on' : ''}`} aria-label="Cart">
         <div className="dr-h">
           <h3>{t('cart')}</h3>
-          <button className="icon-btn" onClick={() => setCartOpen(false)}>
-            ✕
+          <button className="icon-btn" aria-label="Close cart" onClick={() => setCartOpen(false)}>
+            <IconClose size={18} />
           </button>
         </div>
         <div className="dr-b">
@@ -318,9 +323,14 @@ export function StoreShell({ children }: { children: React.ReactNode }) {
         {cart.length > 0 && (
           <div className="dr-f">
             <div className="ship-note">
-              {subtotal < cfg.free_shipping_over
-                ? t('add_more', money(lang, cfg.free_shipping_over - subtotal))
-                : t('free_unlocked')}
+              {subtotal < cfg.free_shipping_over ? (
+                t('add_more', money(lang, cfg.free_shipping_over - subtotal))
+              ) : (
+                <span className="inline-ico">
+                  <IconSparkle size={15} />
+                  {t('free_unlocked')}
+                </span>
+              )}
             </div>
             <div className="row t">
               <span>{t('subtotal')}</span>
