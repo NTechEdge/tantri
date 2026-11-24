@@ -63,6 +63,16 @@
 .adm-h-ico { display: flex; align-items: center; gap: 8px; }
 .adm-h-ico svg { color: var(--maroon); flex-shrink: 0; }
 .adm-feat-tag { display: inline-flex; align-items: center; gap: 3px; color: var(--gold); font-weight: 600; }
+.adm-f2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.adm-f3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.adm-chk { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
+.adm-chk label { display: flex; gap: 6px; align-items: center; font-weight: 500; cursor: pointer; }
+.adm-mback { position: fixed; inset: 0; background: rgba(30, 10, 8, 0.5); z-index: 90; }
+.adm-mdl { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(720px, 94vw); max-height: 92vh; overflow: auto; background: #fff; border-radius: 18px; padding: 28px; z-index: 100; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25); }
+.adm-mdl h2 { font-family: "Playfair Display", serif; margin-bottom: 18px; }
+.adm-acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+.adm-imgs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.adm-imgs img { width: 72px; height: 86px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
 @media (max-width: 900px) {
   .adm-app { grid-template-columns: 1fr; }
   .adm-side { position: static; height: auto; flex-direction: row; overflow: auto; padding: 10px; }
@@ -70,5 +80,5 @@
   .adm-side .nv { white-space: nowrap; width: auto; }
   .adm-main { padding: 18px; }
   .adm-kpis { grid-template-columns: 1fr 1fr; }
-  .adm-g { grid-template-columns: 1fr; }
+  .adm-g, .adm-f2, .adm-f3 { grid-template-columns: 1fr; }
 }
