@@ -31,7 +31,7 @@ function LoginModal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: clean, lang }),
       });
-      if (!r.ok && r.status !== 404) {
+      if (!r.ok) {
         const d = await r.json().catch(() => ({}));
         throw new Error(d.error || t('err_generic'));
       }
@@ -54,14 +54,9 @@ function LoginModal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code: otp.trim() }),
       });
-      let loggedUser;
-      if (r.status === 404) {
-        loggedUser = { id: 'demo', email, role: 'customer' as const };
-      } else {
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(d.error || t('err_generic'));
-        loggedUser = d.user;
-      }
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || t('err_generic'));
+      const loggedUser = d.user;
       setUser(loggedUser);
       toast(t('logged_as', loggedUser.email));
       const cb = afterLoginCb;

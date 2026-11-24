@@ -138,17 +138,12 @@ export default function CheckoutPage() {
           payment_sender: sender,
           lang,
           coupon: appliedCode || null,
-          items: cart.map((i) => ({ id: i.id, qty: i.qty, size: i.size, color: i.color })),
+          items: cart.map((i) => ({ id: i.id, slug: i.slug, qty: i.qty, size: i.size, color: i.color })),
         }),
       });
-      let result: { order_no: string; id: string; total: number };
-      if (res.status === 404) {
-        result = { order_no: 'TN' + Date.now().toString().slice(-8), id: 'demo', total: grand };
-      } else {
-        const d = await res.json();
-        if (!res.ok) throw new Error(d.error || t('err_generic'));
-        result = d;
-      }
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || t('err_generic'));
+      const result: { order_no: string; id: string; total: number } = d;
       clearCart();
       setPlaced({ ...result, pm });
     } catch (e) {
