@@ -44,9 +44,8 @@ const NAV: { key: AdminView; icon: React.ReactNode; label: string }[] = [
 
 export default function AdminPage() {
   const [me, setMe] = useState<User | null>(null);
-  const [step, setStep] = useState<1 | 2>(1);
-  const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
+  const [email, setEmail] = useState('admin@tantri.com');
+  const [password, setPassword] = useState('');
   const [authErr, setAuthErr] = useState('');
   const [view, setView] = useState<AdminView>('dashboard');
   const [toastMsg, setToastMsg] = useState('');
@@ -107,49 +106,27 @@ export default function AdminPage() {
     }
   }, [me, view, ostatus]);
 
-  const sendOtp = async () => {
-    const clean = email.trim().toLowerCase();
+  const loginWithPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
     setAuthErr('');
     try {
-      const r = await fetch('/api/auth/request-otp', {
+      const r = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: clean }),
-      });
-      if (!r.ok && r.status !== 404) {
-        const d = await r.json().catch(() => ({}));
-        throw new Error(d.error || 'Failed');
-      }
-      setEmail(clean);
-      setStep(2);
-    } catch (e) {
-      setAuthErr(e instanceof Error ? e.message : 'Failed');
-    }
-  };
-
-  const verifyOtp = async () => {
-    setAuthErr('');
-    try {
-      const r = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
       if (r.status === 404) {
-        setMe({ id: 'demo-admin', email: email || 'admin@tantri.demo', role: 'admin' });
-        return;
+        if (email.trim().toLowerCase() === 'admin@tantri.com' && password === 'Admin@1234') {
+          setMe({ id: 'demo-admin', email: 'admin@tantri.com', role: 'admin' });
+          return;
+        }
+        throw new Error('Invalid admin email or password');
       }
       const d = await r.json();
-      if (!r.ok) throw new Error(d.error || 'Failed');
-      if (d.user?.role !== 'admin') {
-        await fetch('/api/auth/logout', { method: 'POST' });
-        setStep(1);
-        setAuthErr('This email is not an admin account.');
-        return;
-      }
+      if (!r.ok) throw new Error(d.error || 'Login failed');
       setMe(d.user);
-    } catch (e) {
-      setAuthErr(e instanceof Error ? e.message : 'Failed');
+    } catch (err) {
+      setAuthErr(err instanceof Error ? err.message : 'Login failed');
     }
   };
 
@@ -157,62 +134,38 @@ export default function AdminPage() {
     return (
       <div className="adm-wrap">
         <div className="adm-login">
-          <div className="box">
+          <form className="box" onSubmit={loginWithPassword}>
             <img src="/img/logo.svg" alt="Tantri" />
             <h2>Admin sign in</h2>
-            {step === 1 ? (
-              <>
-                <p>Enter your admin email. We&apos;ll email you a one-time code.</p>
-                <div className="fld">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && sendOtp()}
-                    autoFocus
-                  />
-                </div>
-                {authErr && <div className="err">{authErr}</div>}
-                <button className="adm-btn" style={{ width: '100%', justifyContent: 'center' }} onClick={sendOtp}>
-                  Send code
-                </button>
-              </>
-            ) : (
-              <>
-                <p>
-                  Code sent to <b>{email}</b>
-                </p>
-                <div className="fld">
-                  <label>6-digit code</label>
-                  <input
-                    maxLength={6}
-                    inputMode="numeric"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                    onKeyDown={(e) => e.key === 'Enter' && verifyOtp()}
-                    style={{ letterSpacing: 8, fontSize: 22, textAlign: 'center' }}
-                    autoFocus
-                  />
-                </div>
-                {authErr && <div className="err">{authErr}</div>}
-                <button className="adm-btn" style={{ width: '100%', justifyContent: 'center' }} onClick={verifyOtp}>
-                  Verify &amp; sign in
-                </button>
-                <p style={{ margin: '14px 0 0', textAlign: 'center' }}>
-                  <button
-                    style={{ color: 'var(--maroon)', textDecoration: 'underline' }}
-                    onClick={() => {
-                      setStep(1);
-                      setCode('');
-                    }}
-                  >
-                    Use a different email
-                  </button>
-                </p>
-              </>
-            )}
-          </div>
+            <p>Sign in with your admin email and password.</p>
+            <div className="fld">
+              <label>Email</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="fld">
+              <label>Password</label>
+              <input
+                type="password"
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            {authErr && <div className="err">{authErr}</div>}
+            <button type="submit" className="adm-btn" style={{ width: '100%', justifyContent: 'center' }}>
+              Sign in
+            </button>
+            <p className="adm-mut" style={{ fontSize: 12, margin: '14px 0 0', textAlign: 'center' }}>
+              Demo: admin@tantri.com / Admin@1234
+            </p>
+          </form>
         </div>
       </div>
     );
@@ -239,7 +192,7 @@ export default function AdminPage() {
             onClick={async () => {
               await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
               setMe(null);
-              setStep(1);
+              setPassword('');
             }}
           >
             <IconLogout size={18} /> Log out
