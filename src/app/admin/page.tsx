@@ -44,7 +44,7 @@ const NAV: { key: AdminView; icon: React.ReactNode; label: string }[] = [
 
 export default function AdminPage() {
   const [me, setMe] = useState<User | null>(null);
-  const [email, setEmail] = useState('admin@tantri.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authErr, setAuthErr] = useState('');
   const [view, setView] = useState<AdminView>('dashboard');
@@ -143,6 +143,7 @@ export default function AdminPage() {
               <input
                 type="email"
                 required
+                placeholder="admin@tantri.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoFocus
