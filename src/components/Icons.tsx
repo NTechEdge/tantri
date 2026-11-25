@@ -212,3 +212,12 @@ export function IconChevronDown({ size = 16, className }: IconProps) {
     </svg>
   );
 }
+
+export function IconCamera({ size = 17, className }: IconProps) {
+  return (
+    <svg {...base(size, className)}>
+      <path d="M14.5 4h-5L7 6H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3l-2.5-2Z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  );
+}

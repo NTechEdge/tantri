@@ -6,9 +6,11 @@ import {
   IconAlert,
   IconAward,
   IconBox,
+  IconCamera,
   IconChart,
   IconCheck,
   IconChevronDown,
+  IconClose,
   IconGlobe,
   IconLogout,
   IconLoom,
@@ -56,6 +58,43 @@ const NAV: { key: AdminView; icon: React.ReactNode; label: string }[] = [
   { key: 'settings', icon: <IconSettings size={18} />, label: 'Settings' },
 ];
 
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+async function compressImageFile(file: File): Promise<string> {
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    throw new Error('Only JPG, PNG, or WebP images are allowed');
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    throw new Error(`"${file.name}" exceeds the 5MB limit`);
+  }
+  const raw = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error('Failed to read image'));
+    reader.readAsDataURL(file);
+  });
+  return new Promise<string>((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 1000;
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve(raw);
+      ctx.drawImage(img, 0, 0, w, h);
+      const out = canvas.toDataURL('image/webp', 0.82);
+      resolve(out.startsWith('data:image/webp') ? out : canvas.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => resolve(raw);
+    img.src = raw;
+  });
+}
+
 interface ProductFormState {
   id?: string;
   name: string;
@@ -69,7 +108,7 @@ interface ProductFormState {
   origin: string;
   sizes: string;
   colors: string;
-  images: string;
+  images: string[];
   description: string;
   description_bn: string;
   featured: boolean;
@@ -118,6 +157,7 @@ export default function AdminPage() {
   const [offerModal, setOfferModal] = useState<OfferFormState | null>(null);
   const [modalErr, setModalErr] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploadingImgs, setUploadingImgs] = useState(false);
 
   const toast = (m: string) => {
     setToastMsg(m);
@@ -224,6 +264,7 @@ export default function AdminPage() {
 
   const openProductModal = (p?: Product) => {
     setModalErr('');
+    setUploadingImgs(false);
     setProdModal({
       id: p?.id,
       name: p?.name || '',
@@ -237,12 +278,29 @@ export default function AdminPage() {
       origin: p?.origin || 'Made in Bangladesh',
       sizes: (p?.sizes || []).join(', '),
       colors: (p?.colors || []).join(', '),
-      images: (p?.images || ['/img/products/rajshahi-maroon-check-lungi.svg']).join('\n'),
+      images: p?.images ? [...p.images] : [],
       description: p?.description || '',
       description_bn: p?.description_bn || '',
       featured: Boolean(p?.featured),
       active: p ? p.active !== false && p.active !== 0 : true,
     });
+  };
+
+  const handlePhotoUpload = async (files: FileList | null) => {
+    if (!files?.length || !prodModal) return;
+    setModalErr('');
+    setUploadingImgs(true);
+    try {
+      const added: string[] = [];
+      for (const f of Array.from(files)) {
+        added.push(await compressImageFile(f));
+      }
+      setProdModal((prev) => (prev ? { ...prev, images: [...prev.images, ...added] } : prev));
+    } catch (err) {
+      setModalErr(err instanceof Error ? err.message : 'Failed to load image');
+    } finally {
+      setUploadingImgs(false);
+    }
   };
 
   const saveProduct = async (e: React.FormEvent) => {
@@ -262,10 +320,7 @@ export default function AdminPage() {
       origin: prodModal.origin.trim() || 'Made in Bangladesh',
       sizes: splitList(prodModal.sizes),
       colors: splitList(prodModal.colors),
-      images: prodModal.images
-        .split(/[\n,]+/)
-        .map((s) => s.trim())
-        .filter(Boolean),
+      images: prodModal.images,
       description: prodModal.description.trim(),
       description_bn: prodModal.description_bn.trim(),
       featured: prodModal.featured,
@@ -1111,23 +1166,45 @@ export default function AdminPage() {
               <input value={prodModal.origin} onChange={(e) => setProdModal({ ...prodModal, origin: e.target.value })} />
             </div>
             <div className="fld">
-              <label>Image URLs (one per line or comma separated)</label>
-              <textarea
-                rows={2}
-                value={prodModal.images}
-                onChange={(e) => setProdModal({ ...prodModal, images: e.target.value })}
-              />
-              {prodModal.images.trim() && (
-                <div className="adm-imgs" style={{ marginTop: 8 }}>
-                  {prodModal.images
-                    .split(/[\n,]+/)
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                    .map((u, idx) => (
-                      <img key={idx} src={u} alt="" />
-                    ))}
+              <label>Images (first one is the main photo)</label>
+              {prodModal.images.length > 0 && (
+                <div className="adm-imgs">
+                  {prodModal.images.map((u, idx) => (
+                    <div className="adm-img-item" key={idx}>
+                      <img src={u} alt="" />
+                      {idx === 0 && <span className="adm-img-main">Main</span>}
+                      <button
+                        type="button"
+                        className="adm-img-rm"
+                        aria-label="Remove image"
+                        onClick={() =>
+                          setProdModal({
+                            ...prodModal,
+                            images: prodModal.images.filter((_, i) => i !== idx),
+                          })
+                        }
+                      >
+                        <IconClose size={12} />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
+              <label className="adm-drop" style={{ display: 'flex', marginBottom: 0 }}>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  hidden
+                  disabled={uploadingImgs}
+                  onChange={(e) => {
+                    void handlePhotoUpload(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
+                <IconCamera size={17} />
+                <span>{uploadingImgs ? 'Processing photos…' : 'Click to upload photos (JPG / PNG / WebP, max 5MB)'}</span>
+              </label>
             </div>
             <div className="adm-f2">
               <div className="fld">
@@ -1170,7 +1247,7 @@ export default function AdminPage() {
               <button type="button" className="adm-btn o" onClick={() => setProdModal(null)}>
                 Cancel
               </button>
-              <button type="submit" className="adm-btn" disabled={saving}>
+              <button type="submit" className="adm-btn" disabled={saving || uploadingImgs}>
                 {saving ? 'Saving…' : 'Save product'}
               </button>
             </div>

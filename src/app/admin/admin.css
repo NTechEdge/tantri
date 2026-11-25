@@ -73,6 +73,11 @@
 .adm-acts { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
 .adm-imgs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .adm-imgs img { width: 72px; height: 86px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
+.adm-img-item { position: relative; }
+.adm-img-rm { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--maroon); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
+.adm-img-main { position: absolute; left: 4px; bottom: 4px; background: rgba(42, 31, 23, 0.78); color: #fff; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 6px; }
+.adm-drop { display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px dashed var(--line); border-radius: 12px; padding: 18px 14px; color: var(--muted); cursor: pointer; transition: 0.15s; background: #fffdf9; text-align: center; font-size: 13.5px; }
+.adm-drop:hover { border-color: var(--maroon); color: var(--maroon); background: #fbf8f1; }
 @media (max-width: 900px) {
   .adm-app { grid-template-columns: 1fr; }
   .adm-side { position: static; height: auto; flex-direction: row; overflow: auto; padding: 10px; }
