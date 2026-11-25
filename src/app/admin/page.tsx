@@ -213,7 +213,8 @@ export default function AdminPage() {
         }
         throw new Error('Invalid admin email or password');
       }
-      const d = await r.json();
+      const d = await r.json().catch(() => null);
+      if (!d) throw new Error(`Server error (${r.status}) — backend may be waking up or unreachable`);
       if (!r.ok) throw new Error(d.error || 'Login failed');
       setMe(d.user);
     } catch (err) {
