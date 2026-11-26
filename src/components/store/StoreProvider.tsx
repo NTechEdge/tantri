@@ -86,7 +86,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           if (Array.isArray(offs) && offs.length) setBannerOffer(offs[0]);
         }
       } catch {
-        // Fallback to demo state when backend APIs are not mounted yet
+        // Fallback to demo state when backend APIs are unreachable
       }
     })();
   }, []);
