@@ -116,9 +116,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <button type="submit" className="adm-btn" style={{ width: '100%', justifyContent: 'center' }}>
               Sign in
             </button>
-            <p className="adm-mut" style={{ fontSize: 12, margin: '14px 0 0', textAlign: 'center' }}>
-              Demo: admin@tantri.com / Admin@1234
-            </p>
           </form>
         </div>
       </div>
